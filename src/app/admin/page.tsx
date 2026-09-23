@@ -27,6 +27,7 @@ function AdminLogin() {
   const { loginAdmin } = useStore();
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleSubmit() {
     const ok = loginAdmin(password);
@@ -51,19 +52,30 @@ function AdminLogin() {
         </div>
         <div className="field">
           <label>รหัสผ่าน</label>
-          <input
-            type="password"
-            value={password}
-            placeholder="••••••••"
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError(false);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSubmit();
-            }}
-            autoFocus
-          />
+          <div className="password-wrap">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              placeholder="••••••••"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSubmit();
+              }}
+              autoFocus
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? "🙈 ซ่อน" : "👁️ แสดง"}
+            </button>
+          </div>
         </div>
         {error && (
           <div style={{ color: "var(--danger)", fontSize: 14, marginBottom: 10 }}>
