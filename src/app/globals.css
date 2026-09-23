@@ -25,6 +25,11 @@ body {
   padding: 0;
 }
 
+/* จองพื้นที่ scrollbar ไว้เสมอ — หน้าสั้น/ยาวกว้างเท่ากัน ไม่สั่นตอนสลับแท็บ */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -382,6 +387,33 @@ a.menu-card:hover {
 .field textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(201, 138, 45, 0.18);
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.field .password-wrap input {
+  padding-right: 64px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.password-toggle:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
 }
 
 /* -------- Option chips / segment ---------- */
