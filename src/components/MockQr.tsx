@@ -23,8 +23,6 @@ function cellBlack(i: number, j: number): boolean {
 }
 
 export function MockQr() {
-  const size = GRID * (CELL + 1) + MARGIN * 2 - 1;
-
   return (
     <div
       style={{
@@ -35,8 +33,6 @@ export function MockQr() {
         background: "#fff",
         borderRadius: 10,
         border: "1px solid var(--border)",
-        width: size,
-        height: size,
         margin: "0 auto",
       }}
     >
