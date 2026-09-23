@@ -230,6 +230,7 @@ a.nav-link:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 232px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -253,6 +254,10 @@ a.menu-card:hover {
   font-size: 13px;
   color: var(--ink-soft);
   flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .menu-card .row {

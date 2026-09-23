@@ -27,7 +27,7 @@ export class Drink extends MenuItem {
 
   getDefaultOptions(): DrinkOptions {
     return {
-      size: "M",
+      size: "S",
       temperature: "cold",
       sweetnessPercent: 100,
       toppings: [],

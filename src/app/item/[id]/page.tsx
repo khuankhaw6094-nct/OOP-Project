@@ -43,7 +43,7 @@ export default function ItemPage() {
 
   return (
     <div>
-      <Link href="/" className="nav-link" style={{ background: "none", paddingLeft: 0 }}>
+      <Link href="/" className="btn btn-ghost">
         ← กลับเมนู
       </Link>
 
