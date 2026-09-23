@@ -53,6 +53,7 @@ export interface PaymentReceipt {
   queueNumber: number | null;
   refCode: string | null;
   timestamp: number;
+  completed: boolean;
 }
 
 export interface MenuDraft {
