@@ -236,8 +236,8 @@ a.nav-link:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  /* 232px (ออกแบบไว้กับรูป 72px) + ส่วนที่รูปใหญ่ขึ้น 148px (72 → 220) */
-  min-height: 380px;
+  /* เนื้อหาสูงสุด: padding 36 + รูป 180 + ชื่อ 26 + คำอธิบาย 2 บรรทัด 40 + แถวราคา 37 + gap 18 ≈ 339 → เผื่อ ~10 */
+  min-height: 350px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -252,7 +252,7 @@ a.menu-card:hover {
   line-height: 1;
 }
 
-/* รูปเมนูขนาด 220px (จาก espresso.jpg 735x678 ที่ด้านสั้นสุด 678px ÷ จอ 3x ≈ 226 → ปัดลง 220)
+/* รูปเมนูขนาด 180px — ต่ำกว่าเพดานความคม 226px (espresso.jpg 735x678: ด้านสั้นสุด 678px ÷ จอ 3x)
    จัดกึ่งกลาง และหดตามการ์ดได้ถ้าการ์ดแคบกว่า โดยยังคงเป็นสี่เหลี่ยมจัตุรัส */
 .menu-card > img,
 .menu-card > .emoji {
@@ -291,6 +291,11 @@ a.menu-card:hover {
   font-size: 18px;
   font-weight: 800;
   color: var(--accent-hover);
+}
+
+/* ราคาบนการ์ดเมนูให้เด่นขึ้น (หน้ารายละเอียดยังใช้ 18px ตามเดิม) */
+.menu-card .price {
+  font-size: 24px;
 }
 
 /* ป้ายท้ายการ์ดเมนู — เป็นข้อความกำกับ ไม่ใช่ปุ่ม (ทั้งการ์ดคลิกไปหน้ารายละเอียดได้อยู่แล้ว) */
