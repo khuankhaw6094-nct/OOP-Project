@@ -110,6 +110,7 @@ export default function AdminPage() {
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
+    toggleOrderCompleted,
   } = useStore();
 
   const [tab, setTab] = useState<AdminTab>("menu");
@@ -173,6 +174,14 @@ export default function AdminPage() {
   if (!isAdmin) {
     return <AdminLogin />;
   }
+
+  // ออเดอร์ที่ยังไม่เสร็จอยู่บนสุด (ใหม่ก่อน), ออเดอร์ที่เสร็จแล้วเด้งไปอยู่ล่างสุด
+  const sortedReceipts = [...receipts].sort((a, b) => {
+    const aDone = !!a.completed;
+    const bDone = !!b.completed;
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    return b.timestamp - a.timestamp;
+  });
 
   return (
     <div>
@@ -378,48 +387,76 @@ export default function AdminPage() {
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
-              {receipts.map((receipt) => (
-                <div className="order-row" key={receipt.orderId}>
-                  <div className="head">
-                    <div>
-                      <strong>
-                        {receipt.queueNumber !== null
-                          ? `คิว #${receipt.queueNumber}`
-                          : "จ่ายผ่าน QR"}
-                      </strong>
-                      <div className="meta">
-                        {formatDateTime(receipt.timestamp)} · {receipt.orderId}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <strong>{receipt.customerName}</strong>
-                      <div className="meta">{receipt.paymentLabel}</div>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: 8, fontSize: 14 }}>
-                    {receipt.lines.map((line, index) => (
-                      <div className="receipt-line" key={index}>
-                        <span>
-                          {line.quantity}× {line.name}
-                          {line.optionsLabel && line.optionsLabel !== "—"
-                            ? ` (${line.optionsLabel})`
-                            : ""}
-                        </span>
-                        <span>{formatBaht(line.lineTotal)}</span>
-                      </div>
-                    ))}
-                  </div>
+              {sortedReceipts.map((receipt) => {
+                const isDone = !!receipt.completed;
+                return (
                   <div
-                    className="receipt-footer"
-                    style={{ display: "flex", justifyContent: "space-between" }}
+                    className="order-row"
+                    key={receipt.orderId}
+                    style={{
+                      background: isDone
+                        ? "#e5e7eb"
+                        : "rgba(34, 197, 94, 0.12)",
+                      border: isDone
+                        ? "1px solid #9ca3af"
+                        : "1px solid #22c55e",
+                      borderRadius: 12,
+                      padding: 12,
+                      transition: "background 0.2s ease, border-color 0.2s ease",
+                      textDecoration: isDone ? "line-through" : "none",
+                      color: isDone ? "#6b7280" : "inherit",
+                    }}
                   >
-                    <span className="meta">
-                      {receipt.refCode ? `Ref: ${receipt.refCode}` : ""}
-                    </span>
-                    <strong>{formatBaht(receipt.total)}</strong>
+                    <div className="head">
+                      <div>
+                        <strong>
+                          {receipt.queueNumber !== null
+                            ? `คิว #${receipt.queueNumber}`
+                            : "จ่ายผ่าน QR"}
+                        </strong>
+                        <div className="meta">
+                          {formatDateTime(receipt.timestamp)} · {receipt.orderId}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <strong>{receipt.customerName}</strong>
+                        <div className="meta">{receipt.paymentLabel}</div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 8, fontSize: 14 }}>
+                      {receipt.lines.map((line, index) => (
+                        <div className="receipt-line" key={index}>
+                          <span>
+                            {line.quantity}× {line.name}
+                            {line.optionsLabel && line.optionsLabel !== "—"
+                              ? ` (${line.optionsLabel})`
+                              : ""}
+                          </span>
+                          <span>{formatBaht(line.lineTotal)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div
+                      className="receipt-footer"
+                      style={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <span className="meta">
+                        {receipt.refCode ? `Ref: ${receipt.refCode}` : ""}
+                      </span>
+                      <strong>{formatBaht(receipt.total)}</strong>
+                    </div>
+                    <div style={{ marginTop: 10, textDecoration: "none" }}>
+                      <button
+                        type="button"
+                        className={isDone ? "btn btn-ghost btn-sm" : "btn btn-primary btn-sm"}
+                        onClick={() => toggleOrderCompleted(receipt.orderId)}
+                      >
+                        {isDone ? "↩️ ยกเลิกเสร็จ" : "✅ เสร็จเรียบร้อยแล้ว"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </>

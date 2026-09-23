@@ -40,6 +40,8 @@ interface StoreContextValue {
 
   checkout: (customerName: string, method: "cash" | "qr") => PaymentReceipt;
 
+  toggleOrderCompleted: (orderId: string) => void;
+
   addMenuItem: (draft: MenuDraft) => void;
   updateMenuItem: (oldId: string, draft: MenuDraft) => void;
   deleteMenuItem: (id: string) => void;
@@ -204,7 +206,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const payment =
         method === "cash"
           ? new CashPayment(QueueCounter.getInstance())
-          : new QRPayment();
+          : new QRPayment(QueueCounter.getInstance());
       const receipt = cart.checkout(payment);
       const next = [...receipts, receipt];
       persistOrders(next);
@@ -215,6 +217,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [cart, receipts]
   );
+
+  const toggleOrderCompleted = useCallback((orderId: string) => {
+    setReceipts((prev) => {
+      const next = prev.map((receipt) =>
+        receipt.orderId === orderId
+          ? { ...receipt, completed: !receipt.completed }
+          : receipt
+      );
+      persistOrders(next);
+      return next;
+    });
+  }, []);
 
   const addMenuItem = useCallback((draft: MenuDraft) => {
     setMenu((prev) => {
@@ -255,6 +269,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateQuantity,
     getMenuItemById,
     checkout,
+    toggleOrderCompleted,
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,

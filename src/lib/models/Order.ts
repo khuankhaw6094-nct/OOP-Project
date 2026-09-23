@@ -60,11 +60,11 @@ export class Order {
     return this.orderLines.reduce((sum, line) => sum + line.getQuantity(), 0);
   }
 
-  addLine(menuItem: MenuItem, options?: DrinkOptions, lineId?: string): OrderLine {
+  addLine(menuItem: MenuItem, options?: DrinkOptions): OrderLine {
     if (this.status !== "cart") {
       throw new Error("ไม่สามารถแก้ไขออเดอร์ที่ชำระแล้วได้");
     }
-    const line = new OrderLine(menuItem, options, 1, lineId);
+    const line = new OrderLine(menuItem, options);
     this.orderLines.push(line);
     return line;
   }
@@ -128,6 +128,7 @@ export class Order {
       queueNumber: result.queueNumber,
       refCode: result.refCode,
       timestamp: result.confirmedAt,
+      completed: false,
     };
   }
 }
