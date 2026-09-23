@@ -58,11 +58,7 @@ export default function MenuPage() {
               <span className="desc">{item.getDescription()}</span>
               <span className="row">
                 <span className="price">{formatBaht(item.getBasePrice())}</span>
-                {item.getCategory() === "drink" ? (
-                  <span className="option-tag">✦ เลือกออปชันได้</span>
-                ) : (
-                  <span className="badge">+ ใส่ตะกร้า</span>
-                )}
+                <span className="option-tag">✦ ดูรายละเอียด</span>
               </span>
             </Link>
           ))}

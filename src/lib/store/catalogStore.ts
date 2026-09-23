@@ -4,7 +4,9 @@ import { MenuItem } from "@/lib/models/MenuItem";
 import type { Category, MenuDraft } from "@/lib/models/types";
 import { createDefaultMenu } from "@/lib/data/menu";
 
-const MENU_KEY = "grindco_menu";
+// v2: เปลี่ยนรูปเมนูจาก .svg เป็น .jpg และเปลี่ยน id บางเมนู — ข้อมูลใต้ key เก่า ("grindco_menu")
+// ที่ค้างในเบราว์เซอร์จะถูกมองข้าม แล้วโหลดเมนูตั้งต้นจาก menu.ts แทน
+const MENU_KEY = "grindco_menu_v2";
 
 interface SerializedMenuItem {
   id: string;
