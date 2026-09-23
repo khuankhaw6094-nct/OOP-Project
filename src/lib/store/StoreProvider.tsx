@@ -231,8 +231,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addMenuItem = useCallback((draft: MenuDraft) => {
+    // สร้าง id นอก updater — React StrictMode (dev) เรียก updater 2 รอบ ถ้าสร้างข้างในจะได้ id
+    // ไม่ตรงกันระหว่าง state กับที่บันทึกลง localStorage
+    const id = createId("mi");
     setMenu((prev) => {
-      const item = makeMenuItem({ ...draft, id: createId("mi") });
+      const item = makeMenuItem({ ...draft, id });
       const next = [...prev, item];
       persistMenu(next);
       return next;

@@ -247,8 +247,8 @@ a.menu-card:hover {
   box-shadow: 0 12px 26px rgba(74, 44, 23, 0.14);
 }
 
+/* ขนาดตัวอักษรของ emoji สำรองกำหนดแบบ inline ใน MenuImage (ตาม size) */
 .menu-card .emoji {
-  font-size: 40px;
   line-height: 1;
 }
 

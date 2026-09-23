@@ -27,6 +27,8 @@ export default function MenuPage() {
         {CATEGORIES.map((category) => (
           <button
             key={category}
+            role="tab"
+            aria-selected={active === category}
             className={`tab-btn ${active === category ? "active" : ""}`}
             onClick={() => setActive(category)}
           >

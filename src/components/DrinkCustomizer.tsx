@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Drink, DRINK_TOPPINGS } from "@/lib/models/Drink";
 import type { DrinkOptions, Size, Temperature, ToppingId } from "@/lib/models/types";
@@ -29,6 +29,8 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
   );
   const [quantity, setQuantity] = useState(1);
   const [showToast, setShowToast] = useState(false);
+  // กันกดซ้ำระหว่างรอพาไปหน้าตะกร้า (ไม่งั้นดับเบิลคลิกจะได้ 2 รายการ)
+  const addingRef = useRef(false);
 
   function setSize(size: Size) {
     setOptions((prev) => ({ ...prev, size }));
@@ -57,6 +59,8 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
   const price = item.getPrice(options);
 
   function handleAdd() {
+    if (addingRef.current) return;
+    addingRef.current = true;
     addToCart(item.getId(), options, quantity);
     setShowToast(true);
     window.setTimeout(() => {
@@ -172,6 +176,7 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
         <button
           type="button"
           className="btn btn-accent btn-block"
+          disabled={showToast}
           onClick={handleAdd}
         >
           เพิ่ม {quantity} แก้วลงตะกร้า · {formatBaht(price * quantity)}

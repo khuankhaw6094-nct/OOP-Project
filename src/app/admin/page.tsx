@@ -117,6 +117,7 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<MenuDraft>(EMPTY_DRAFT);
   const [uploadError, setUploadError] = useState("");
+  const [formError, setFormError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
@@ -139,6 +140,7 @@ export default function AdminPage() {
   function startEdit(id: string) {
     const item = menu.find((entry) => entry.getId() === id);
     if (!item) return;
+    setFormError("");
     setEditingId(id);
     setDraft({
       name: item.getName(),
@@ -153,15 +155,30 @@ export default function AdminPage() {
   function resetForm() {
     setEditingId(null);
     setDraft(EMPTY_DRAFT);
+    setFormError("");
+  }
+
+  function handleDelete(id: string) {
+    deleteMenuItem(id);
+    // ลบเมนูที่กำลังแก้ไขอยู่ — ออกจากโหมดแก้ไข ไม่ให้ฟอร์มค้างข้อมูลของเมนูที่ไม่มีแล้ว
+    if (editingId === id) resetForm();
   }
 
   function handleSubmit() {
-    if (!draft.name.trim()) return;
+    if (!draft.name.trim()) {
+      setFormError("กรุณาใส่ชื่อเมนู");
+      return;
+    }
+    const price = Math.floor(Number(draft.basePrice));
+    if (!Number.isFinite(price) || price < 1) {
+      setFormError("ราคาต้องเป็นตัวเลขตั้งแต่ 1 บาทขึ้นไป");
+      return;
+    }
     const payload: MenuDraft = {
       ...draft,
       name: draft.name.trim(),
       description: draft.description.trim(),
-      basePrice: Math.max(1, Math.floor(Number(draft.basePrice) || 0)),
+      basePrice: price,
     };
     if (editingId) {
       updateMenuItem(editingId, payload);
@@ -331,6 +348,11 @@ export default function AdminPage() {
                 }
               />
             </div>
+            {formError && (
+              <div style={{ color: "var(--danger)", fontSize: 14, marginBottom: 8 }}>
+                {formError}
+              </div>
+            )}
             <div className="actions-row" style={{ marginTop: 4 }}>
               <button className="btn btn-primary" onClick={handleSubmit}>
                 {editingId ? "บันทึกการแก้ไข" : "เพิ่มเมนู"}
@@ -367,7 +389,7 @@ export default function AdminPage() {
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => deleteMenuItem(item.getId())}
+                    onClick={() => handleDelete(item.getId())}
                   >
                     ลบ
                   </button>

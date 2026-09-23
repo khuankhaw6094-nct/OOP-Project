@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Drink } from "@/lib/models/Drink";
@@ -15,6 +15,8 @@ export default function ItemPage() {
   const { getMenuItemById, addToCart } = useStore();
   const [quantity, setQuantity] = useState(1);
   const [showToast, setShowToast] = useState(false);
+  // กันกดซ้ำระหว่างรอพาไปหน้าตะกร้า (ไม่งั้นดับเบิลคลิกจะได้ 2 รายการ)
+  const addingRef = useRef(false);
 
   const item = getMenuItemById(params.id);
 
@@ -36,6 +38,8 @@ export default function ItemPage() {
   const isDrink = item instanceof Drink;
 
   function handleAddFood() {
+    if (addingRef.current) return;
+    addingRef.current = true;
     addToCart(safeItem.getId(), undefined, quantity);
     setShowToast(true);
     window.setTimeout(() => router.push("/cart"), 450);
@@ -92,6 +96,7 @@ export default function ItemPage() {
             <button
               type="button"
               className="btn btn-accent btn-block"
+              disabled={showToast}
               onClick={handleAddFood}
             >
               เพิ่มลงตะกร้า · {formatBaht(item.getPrice() * quantity)}
