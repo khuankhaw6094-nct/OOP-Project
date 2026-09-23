@@ -9,6 +9,7 @@
   --accent: #c98a2d;
   --accent-hover: #b4781f;
   --border: #e7dccb;
+  --border-strong: #d4c1a5;
   --danger: #b3261e;
   --success: #2e7d32;
   --radius: 14px;
@@ -199,7 +200,7 @@ a.nav-link:hover {
 }
 
 .tab-btn {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--ink-soft);
   padding: 9px 18px;
@@ -223,7 +224,7 @@ a.nav-link:hover {
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .menu-card {
@@ -287,6 +288,13 @@ a.menu-card:hover {
   background: var(--surface-alt);
   border: 1px solid var(--border);
   color: var(--ink-soft);
+}
+
+/* ป้ายบอกว่าเครื่องดื่มเลือกออปชันได้ — เป็นข้อความกำกับ ไม่ใช่ปุ่ม (ทั้งการ์ดคลิกได้อยู่แล้ว) */
+.option-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-hover);
 }
 
 /* ---------- Buttons ---------- */
@@ -530,6 +538,20 @@ a.menu-card:hover {
   font-weight: 800;
   min-width: 76px;
   text-align: right;
+}
+
+.customizer-options .option-group:last-child {
+  margin-bottom: 0;
+}
+
+/* ปุ่มเพิ่มลงตะกร้าหน้าเครื่องดื่ม ติดขอบล่างจอระหว่างเลื่อนดูตัวเลือก
+   ใช้ sticky (ไม่ใช่ fixed) จึงกว้างตามคอนเทนต์ ไม่ทับพื้นที่ scrollbar-gutter */
+.sticky-cta {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  padding: 12px 0 16px;
+  background: linear-gradient(to top, var(--bg) 75%, rgba(246, 241, 232, 0));
 }
 
 /* ---------- Summary ---------- */

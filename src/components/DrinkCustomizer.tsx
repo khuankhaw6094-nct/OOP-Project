@@ -66,88 +66,90 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
 
   return (
     <div>
-      <div className="option-group">
-        <div className="option-group-title">ขนาด</div>
-        <div className="chips">
-          {SIZES.map((size) => (
-            <button
-              key={size.value}
-              className={`chip ${options.size === size.value ? "active" : ""}`}
-              onClick={() => setSize(size.value)}
-            >
-              {size.label}
-              <span className="sub"> (+{size.delta})</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="option-group">
-        <div className="option-group-title">อุณหภูมิ</div>
-        <div className="chips">
-          {TEMPERATURES.map((temp) => (
-            <button
-              key={temp.value}
-              className={`chip ${
-                options.temperature === temp.value ? "active" : ""
-              }`}
-              onClick={() => setTemperature(temp.value)}
-            >
-              {temp.emoji} {temp.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="option-group">
-        <div className="option-group-title">ความหวาน</div>
-        <div className="chips">
-          {SWEETNESS.map((level) => (
-            <button
-              key={level}
-              className={`chip ${
-                options.sweetnessPercent === level ? "active" : ""
-              }`}
-              onClick={() => setSweetness(level)}
-            >
-              {level === 100 ? "ปกติ" : `${level}%`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="option-group">
-        <div className="option-group-title">ท็อปปิ้ง (เลือกได้หลายอย่าง)</div>
-        <div className="chips">
-          {DRINK_TOPPINGS.map((top) => {
-            const selected = options.toppings.includes(top.id);
-            return (
+      <div className="card customizer-options">
+        <div className="option-group">
+          <div className="option-group-title">ขนาด (เลือก 1 อย่าง)</div>
+          <div className="chips">
+            {SIZES.map((size) => (
               <button
-                key={top.id}
-                className={`chip ${selected ? "active" : ""}`}
-                onClick={() => toggleTopping(top.id)}
+                key={size.value}
+                className={`chip ${options.size === size.value ? "active" : ""}`}
+                onClick={() => setSize(size.value)}
               >
-                {top.name}
-                <span className="sub"> (+{top.price})</span>
+                {size.label}
+                <span className="sub"> (+{size.delta})</span>
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="option-group">
-        <div className="option-group-title">จำนวน</div>
-        <div className="qty-stepper">
-          <button
-            type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-          >
-            −
-          </button>
-          <span className="qty">{quantity}</span>
-          <button type="button" onClick={() => setQuantity((q) => q + 1)}>
-            +
-          </button>
+        <div className="option-group">
+          <div className="option-group-title">อุณหภูมิ (เลือก 1 อย่าง)</div>
+          <div className="chips">
+            {TEMPERATURES.map((temp) => (
+              <button
+                key={temp.value}
+                className={`chip ${
+                  options.temperature === temp.value ? "active" : ""
+                }`}
+                onClick={() => setTemperature(temp.value)}
+              >
+                {temp.emoji} {temp.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="option-group">
+          <div className="option-group-title">ความหวาน (เลือก 1 อย่าง)</div>
+          <div className="chips">
+            {SWEETNESS.map((level) => (
+              <button
+                key={level}
+                className={`chip ${
+                  options.sweetnessPercent === level ? "active" : ""
+                }`}
+                onClick={() => setSweetness(level)}
+              >
+                {level === 100 ? "ปกติ" : `${level}%`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="option-group">
+          <div className="option-group-title">ท็อปปิ้ง (เลือกได้หลายอย่าง)</div>
+          <div className="chips">
+            {DRINK_TOPPINGS.map((top) => {
+              const selected = options.toppings.includes(top.id);
+              return (
+                <button
+                  key={top.id}
+                  className={`chip ${selected ? "active" : ""}`}
+                  onClick={() => toggleTopping(top.id)}
+                >
+                  {top.name}
+                  <span className="sub"> (+{top.price})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="option-group">
+          <div className="option-group-title">จำนวน</div>
+          <div className="qty-stepper">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            >
+              −
+            </button>
+            <span className="qty">{quantity}</span>
+            <button type="button" onClick={() => setQuantity((q) => q + 1)}>
+              +
+            </button>
+          </div>
         </div>
       </div>
 
@@ -164,6 +166,9 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
           <span>รวม ({quantity} แก้ว)</span>
           <span>{formatBaht(price * quantity)}</span>
         </div>
+      </div>
+
+      <div className="sticky-cta">
         <button
           type="button"
           className="btn btn-accent btn-block"
