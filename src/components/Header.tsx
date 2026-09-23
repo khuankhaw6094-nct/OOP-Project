@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/lib/store/StoreProvider";
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  const onAdminPage = pathname.startsWith("/admin");
   const { cart, isAdmin, logoutAdmin } = useStore();
   const itemCount = cart.getItemCount();
 
@@ -30,10 +32,10 @@ export function Header() {
         <div className="header-actions">
           {isAdmin ? (
             <>
-              <Link href="/" className="nav-link">
+              <Link href="/" className={`nav-link ${onAdminPage ? "" : "nav-link-active"}`}>
                 👥 หน้าร้านลูกค้า
               </Link>
-              <Link href="/admin" className="nav-link nav-link-active">
+              <Link href="/admin" className={`nav-link ${onAdminPage ? "nav-link-active" : ""}`}>
                 🛠️ แผงแอดมิน
               </Link>
               <button type="button" className="nav-link nav-link-btn" onClick={handleLogout}>

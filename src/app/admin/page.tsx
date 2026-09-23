@@ -275,9 +275,6 @@ export default function AdminPage() {
                 placeholder="http://... หรือ /menu/รูป.svg (วาง URL ก็ได้)"
                 onChange={(e) => setDraft((prev) => ({ ...prev, image: e.target.value }))}
               />
-              <div style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 6 }}>
-                เลือกรูปจากเครื่อง หรือวาง URL ภาพ — เว้นว่าง = ใช้สัญลักษณ์แทน
-              </div>
               {uploadError && (
                 <div style={{ color: "var(--danger)", fontSize: 14, marginTop: 6 }}>
                   {uploadError}
