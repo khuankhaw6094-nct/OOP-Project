@@ -17,8 +17,8 @@ export class OrderLine {
   private readonly selectedOptions: DrinkOptions | null;
   private quantity: number;
 
-  constructor(menuItem: MenuItem, options: DrinkOptions | null = null, quantity = 1) {
-    this.id = createId("line");
+  constructor(menuItem: MenuItem, options: DrinkOptions | null = null, quantity = 1, id?: string) {
+    this.id = id ?? createId("line");
     this.menuItem = menuItem;
     this.selectedOptions = options ? cloneOptions(options) : null;
     this.quantity = Math.max(1, quantity);
