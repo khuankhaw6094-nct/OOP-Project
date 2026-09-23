@@ -1,0 +1,17 @@
+=============================================
+  Grind and Co. - Self-Order Coffee
+  Server:  http://localhost:3000
+  To stop the shop: close this window (Ctrl+C)
+  Keep this window open while using the shop.
+=============================================
+Starting server...
+
+> coffee-tale@0.1.0 dev
+> next dev 3000
+
+Invalid project directory provided, no such directory: C:\pi2\OOP-Project\3000
+
+[ERROR] Server stopped with an error, or port 3000 is already in use.
+        Close other Grind windows, then run start.bat again.
+
+Press any key to continue . . . 
