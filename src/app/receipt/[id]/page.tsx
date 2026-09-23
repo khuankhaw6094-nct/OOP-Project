@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/lib/store/StoreProvider";
@@ -10,38 +9,6 @@ export default function ReceiptPage() {
   const params = useParams<{ id: string }>();
   const { receipts } = useStore();
   const receipt = receipts.find((entry) => entry.orderId === params.id);
-
-  const [slipPreview, setSlipPreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // เคลียร์ object URL เก่าทิ้งทุกครั้งที่มีการเปลี่ยนรูป หรือตอนออกจากหน้า
-  useEffect(() => {
-    return () => {
-      if (slipPreview) {
-        URL.revokeObjectURL(slipPreview);
-      }
-    };
-  }, [slipPreview]);
-
-  const handleSlipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (slipPreview) {
-      URL.revokeObjectURL(slipPreview);
-    }
-    setSlipPreview(URL.createObjectURL(file));
-  };
-
-  const handleRemoveSlip = () => {
-    if (slipPreview) {
-      URL.revokeObjectURL(slipPreview);
-    }
-    setSlipPreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   if (!receipt) {
     return (
@@ -88,61 +55,6 @@ export default function ReceiptPage() {
               ✅ ชำระเงินสำเร็จ
             </div>
             <div className="queue-label">Ref: {receipt.refCode}</div>
-
-            {/* แนบสลิปโอนเงิน — แสดงตัวอย่างชั่วคราวในเครื่องเท่านั้น ไม่บันทึกถาวร */}
-            <div
-              style={{
-                marginTop: 14,
-                padding: 12,
-                border: "1px dashed var(--border)",
-                borderRadius: 12,
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 8 }}>
-                แนบสลิปโอนเงิน
-              </div>
-
-              {slipPreview ? (
-                <div>
-                  <img
-                    src={slipPreview}
-                    alt="สลิปโอนเงิน"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: 260,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  />
-                  <div>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={handleRemoveSlip}
-                    >
-                      ลบรูป
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  📎 เลือกรูปสลิป
-                </button>
-              )}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleSlipChange}
-                style={{ display: "none" }}
-              />
-            </div>
           </div>
         )}
 
