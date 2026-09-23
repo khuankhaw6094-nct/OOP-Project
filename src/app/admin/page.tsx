@@ -284,7 +284,7 @@ export default function AdminPage() {
               />
               <input
                 value={draft.image}
-                placeholder="http://... หรือ /menu/รูป.svg (วาง URL ก็ได้)"
+                placeholder="http://... หรือ /menu/รูป.jpg (วาง URL ก็ได้)"
                 onChange={(e) => setDraft((prev) => ({ ...prev, image: e.target.value }))}
               />
               {uploadError && (
