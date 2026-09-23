@@ -575,6 +575,9 @@ a.menu-card:hover {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ---------- Receipt ---------- */
@@ -762,4 +765,24 @@ a.menu-card:hover {
   font-size: 44px;
   display: block;
   margin-bottom: 10px;
+}
+
+.app-loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-loading-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.app-loading-inner .emoji {
+  font-size: 40px;
 }

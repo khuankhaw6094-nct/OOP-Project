@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { markHydrated, useHydrated } from "@/lib/hydration";
 import { Order } from "@/lib/models/Order";
 import { CashPayment } from "@/lib/models/CashPayment";
 import { QRPayment } from "@/lib/models/QRPayment";
@@ -51,7 +52,8 @@ function cloneOrder(order: Order): Order {
   for (const line of order.getLines()) {
     const added = clone.addLine(
       line.getMenuItem(),
-      line.getSelectedOptions() ?? undefined
+      line.getSelectedOptions() ?? undefined,
+      line.getId()
     );
     added.setQuantity(line.getQuantity());
   }
@@ -87,7 +89,11 @@ function persistCart(order: Order): void {
     options: line.getSelectedOptions(),
     quantity: line.getQuantity(),
   }));
-  window.localStorage.setItem(CART_KEY, JSON.stringify(lines));
+  try {
+    window.localStorage.setItem(CART_KEY, JSON.stringify(lines));
+  } catch {
+    // localStorage เต็มหรือไม่พร้อมใช้งาน — ใช้ state ในความจำแทน, ไม่บล็อกการใช้งาน
+  }
 }
 
 function loadReceipts(): PaymentReceipt[] {
@@ -103,7 +109,11 @@ function loadReceipts(): PaymentReceipt[] {
 
 function persistOrders(receipts: PaymentReceipt[]): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(ORDERS_KEY, JSON.stringify(receipts));
+  try {
+    window.localStorage.setItem(ORDERS_KEY, JSON.stringify(receipts));
+  } catch {
+    // localStorage เต็มหรือไม่พร้อมใช้งาน
+  }
 }
 
 function loadAdminState(): boolean {
@@ -113,7 +123,11 @@ function loadAdminState(): boolean {
 
 function persistAdminState(active: boolean): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(ADMIN_KEY, active ? "1" : "0");
+  try {
+    window.localStorage.setItem(ADMIN_KEY, active ? "1" : "0");
+  } catch {
+    // localStorage ไม่พร้อมใช้งาน
+  }
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -123,6 +137,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     loadReceipts()
   );
   const [isAdmin, setIsAdmin] = useState<boolean>(() => loadAdminState());
+  const hydrated = useHydrated();
+
+  useEffect(() => {
+    markHydrated();
+  }, []);
 
   const loginAdmin = useCallback((password: string): boolean => {
     if (password !== ADMIN_PASSWORD) {
@@ -240,6 +259,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateMenuItem,
     deleteMenuItem,
   };
+
+  if (!hydrated) {
+    return (
+      <div className="app-loading" aria-label="กำลังโหลด">
+        <div className="app-loading-inner">
+          <span className="emoji">☕</span>
+          <span>กำลังโหลด...</span>
+        </div>
+      </div>
+    );
+  }
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
