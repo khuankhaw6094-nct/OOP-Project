@@ -36,7 +36,7 @@ export default function ReceiptPage() {
         }}
       >
         <div className="receipt-header">
-          <div className="shop">☕ Grind &amp; Co.</div>
+          <div className="shop">☕ Coffee Tale</div>
           <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
             ใบเสร็จ · {formatDateTime(receipt.timestamp)}
           </div>

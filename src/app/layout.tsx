@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Grind & Co. — Coffee Tale",
+  title: "Coffee Tale",
   description: "ระบบสั่งกาแฟแบบ Self-Order",
 };
 

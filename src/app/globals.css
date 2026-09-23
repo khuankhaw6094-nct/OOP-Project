@@ -236,7 +236,8 @@ a.nav-link:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 232px;
+  /* 232px (ออกแบบไว้กับรูป 72px) + ส่วนที่รูปใหญ่ขึ้น 148px (72 → 220) */
+  min-height: 380px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -249,6 +250,19 @@ a.menu-card:hover {
 .menu-card .emoji {
   font-size: 40px;
   line-height: 1;
+}
+
+/* รูปเมนูขนาด 220px (จาก espresso.jpg 735x678 ที่ด้านสั้นสุด 678px ÷ จอ 3x ≈ 226 → ปัดลง 220)
+   จัดกึ่งกลาง และหดตามการ์ดได้ถ้าการ์ดแคบกว่า โดยยังคงเป็นสี่เหลี่ยมจัตุรัส */
+.menu-card > img,
+.menu-card > .emoji {
+  align-self: center;
+}
+
+.menu-card > img {
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
 }
 
 .menu-card .name {

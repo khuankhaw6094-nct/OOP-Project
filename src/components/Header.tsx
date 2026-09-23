@@ -21,12 +21,8 @@ export function Header() {
       <div className="header-inner">
         <Link href="/" className="brand">
           <span>☕</span>
-          <span>Grind &amp; Co.</span>
-          {isAdmin ? (
-            <span className="tagline admin-tag">โหมดแอดมิน</span>
-          ) : (
-            <span className="tagline">Coffee Tale</span>
-          )}
+          <span>Coffee Tale</span>
+          {isAdmin && <span className="tagline admin-tag">โหมดแอดมิน</span>}
         </Link>
 
         <div className="header-actions">

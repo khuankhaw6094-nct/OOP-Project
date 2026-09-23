@@ -52,7 +52,7 @@ export default function MenuPage() {
                 src={item.getImage()}
                 alt={item.getName()}
                 emoji={item.getEmoji()}
-                size={72}
+                size={220}
               />
               <span className="name">{item.getName()}</span>
               <span className="desc">{item.getDescription()}</span>
