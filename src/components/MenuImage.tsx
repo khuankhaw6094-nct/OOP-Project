@@ -11,9 +11,20 @@ interface MenuImageProps {
   size?: number;
 }
 
+function isRenderableSrc(src: string): boolean {
+  if (src.startsWith("data:")) return true;
+  if (src.startsWith("/") && !src.startsWith("//")) return true;
+  try {
+    new URL(src);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function MenuImage({ src, alt, emoji, size = 72 }: MenuImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const failed = !src || failedSrc === src;
+  const failed = !src || failedSrc === src || !isRenderableSrc(src);
 
   if (failed) {
     return (
