@@ -54,6 +54,7 @@ export interface PaymentReceipt {
   refCode: string | null;
   timestamp: number;
   completed: boolean;
+  slip: string | undefined;
 }
 
 export interface MenuDraft {

@@ -1,12 +1,14 @@
 import { Drink } from "@/lib/models/Drink";
 import { FoodItem } from "@/lib/models/FoodItem";
+import { BakeryItem } from "@/lib/models/BakeryItem";
 import { MenuItem } from "@/lib/models/MenuItem";
 import type { Category, MenuDraft } from "@/lib/models/types";
 import { createDefaultMenu } from "@/lib/data/menu";
 
 // v2: เปลี่ยนรูปเมนูจาก .svg เป็น .jpg และเปลี่ยน id บางเมนู — ข้อมูลใต้ key เก่า ("grindco_menu")
-// ที่ค้างในเบราว์เซอร์จะถูกมองข้าม แล้วโหลดเมนูตั้งต้นจาก menu.ts แทน
-const MENU_KEY = "grindco_menu_v2";
+// ที่ค้างในเบราว์เซอร์จะถูกมองข้ามแล้วลบทิ้ง เพื่อโหลดเมนูตั้งต้นจาก menu.ts แทน
+export const MENU_KEY = "grindco_menu_v2";
+const LEGACY_MENU_KEY = "grindco_menu";
 
 interface SerializedMenuItem {
   id: string;
@@ -16,6 +18,17 @@ interface SerializedMenuItem {
   category: Category;
   basePrice: number;
   image: string;
+}
+
+function buildItem(item: SerializedMenuItem): MenuItem {
+  switch (item.category) {
+    case "drink":
+      return new Drink(item);
+    case "bakery":
+      return new BakeryItem(item);
+    default:
+      return new FoodItem(item);
+  }
 }
 
 function serializeMenu(items: MenuItem[]): SerializedMenuItem[] {
@@ -35,9 +48,7 @@ function deserializeMenu(raw: string | null): MenuItem[] | null {
   try {
     const list: SerializedMenuItem[] = JSON.parse(raw);
     if (!Array.isArray(list) || list.length === 0) return null;
-    return list.map((item) =>
-      item.category === "drink" ? new Drink(item) : new FoodItem(item)
-    );
+    return list.map(buildItem);
   } catch {
     return null;
   }
@@ -45,6 +56,11 @@ function deserializeMenu(raw: string | null): MenuItem[] | null {
 
 export function loadMenuOverride(): MenuItem[] | null {
   if (typeof window === "undefined") return null;
+  try {
+    window.localStorage.removeItem(LEGACY_MENU_KEY);
+  } catch {
+    // ไม่ใช่ปัญหาใหญ่ ถ้าลบ key เก่าไม่ได้
+  }
   return deserializeMenu(window.localStorage.getItem(MENU_KEY));
 }
 
@@ -66,5 +82,5 @@ export function persistMenu(items: MenuItem[]): void {
 }
 
 export function makeMenuItem(draft: MenuDraft & { id: string }): MenuItem {
-  return draft.category === "drink" ? new Drink(draft) : new FoodItem(draft);
+  return buildItem(draft);
 }

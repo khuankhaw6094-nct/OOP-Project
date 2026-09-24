@@ -7,10 +7,11 @@ import { Order } from "@/lib/models/Order";
 import { CashPayment } from "@/lib/models/CashPayment";
 import { QRPayment } from "@/lib/models/QRPayment";
 import { QueueCounter } from "@/lib/models/QueueCounter";
+import { Drink } from "@/lib/models/Drink";
 import { MenuItem } from "@/lib/models/MenuItem";
 import type { DrinkOptions, MenuDraft, PaymentReceipt } from "@/lib/models/types";
 import { createId } from "@/lib/models/id";
-import { makeMenuItem, persistMenu, loadMenu } from "./catalogStore";
+import { makeMenuItem, persistMenu, loadMenu, MENU_KEY } from "./catalogStore";
 
 const CART_KEY = "grindco_cart";
 const ORDERS_KEY = "grindco_orders";
@@ -34,11 +35,16 @@ interface StoreContextValue {
 
   addToCart: (itemId: string, options?: DrinkOptions, quantity?: number) => void;
   removeLine: (lineId: string) => void;
-  updateQuantity: (lineId: string, quantity: number) => void;
+  incrementLine: (lineId: string) => void;
+  decrementLine: (lineId: string) => void;
 
   getMenuItemById: (id: string) => MenuItem | undefined;
 
-  checkout: (customerName: string, method: "cash" | "qr") => PaymentReceipt;
+  checkout: (
+    customerName: string,
+    method: "cash" | "qr",
+    slip?: string
+  ) => Promise<PaymentReceipt>;
 
   toggleOrderCompleted: (orderId: string) => void;
 
@@ -52,12 +58,13 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 function cloneOrder(order: Order): Order {
   const clone = new Order(order.getCustomerName());
   for (const line of order.getLines()) {
-    const added = clone.addLine(
+    clone.addLine(
       line.getMenuItem(),
       line.getSelectedOptions() ?? undefined,
-      line.getId()
+      line.getQuantity(),
+      line.getId(),
+      false
     );
-    added.setQuantity(line.getQuantity());
   }
   return clone;
 }
@@ -78,8 +85,7 @@ function restoreCart(menu: MenuItem[]): Order {
   for (const line of loadCartLines()) {
     const item = menu.find((entry) => entry.getId() === line.itemId);
     if (!item) continue;
-    const added = order.addLine(item, line.options ?? undefined);
-    added.setQuantity(line.quantity);
+    order.addLine(item, line.options ?? undefined, line.quantity);
   }
   return order;
 }
@@ -98,15 +104,36 @@ function persistCart(order: Order): void {
   }
 }
 
-function loadReceipts(): PaymentReceipt[] {
-  if (typeof window === "undefined") return [];
+function parseReceipts(raw: string | null): PaymentReceipt[] {
   try {
-    const raw = window.localStorage.getItem(ORDERS_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? (parsed as PaymentReceipt[]) : [];
+    const parsed = JSON.parse(raw ?? "null");
+    if (!Array.isArray(parsed)) return [];
+    const result: PaymentReceipt[] = [];
+    for (const entry of parsed) {
+      if (!entry || typeof entry !== "object") continue;
+      const r = entry as Record<string, unknown>;
+      result.push({
+        orderId: String(r.orderId ?? ""),
+        customerName: String(r.customerName ?? ""),
+        lines: Array.isArray(r.lines) ? (r.lines as PaymentReceipt["lines"]) : [],
+        total: Number(r.total) || 0,
+        paymentLabel: String(r.paymentLabel ?? ""),
+        queueNumber: typeof r.queueNumber === "number" ? r.queueNumber : null,
+        refCode: typeof r.refCode === "string" ? r.refCode : null,
+        timestamp: Number(r.timestamp) || 0,
+        completed: !!r.completed,
+        slip: typeof r.slip === "string" ? r.slip : undefined,
+      });
+    }
+    return result;
   } catch {
     return [];
   }
+}
+
+function loadReceipts(): PaymentReceipt[] {
+  if (typeof window === "undefined") return [];
+  return parseReceipts(window.localStorage.getItem(ORDERS_KEY));
 }
 
 function persistOrders(receipts: PaymentReceipt[]): void {
@@ -145,6 +172,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     markHydrated();
   }, []);
 
+  // ซิงค์ข้อมูลระหว่างแท็บ: ถ้าอีกแท็บแก้เมนู/ออเดอร์/สถานะแอดมิน แท็บนี้จะโหลดใหม่ทันที
+  useEffect(() => {
+    function onStorage(event: StorageEvent) {
+      if (event.key === MENU_KEY) setMenu(loadMenu());
+      if (event.key === CART_KEY) setCart(restoreCart(loadMenu()));
+      if (event.key === ORDERS_KEY) setReceipts(loadReceipts());
+      if (event.key === ADMIN_KEY) setIsAdmin(loadAdminState());
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   const loginAdmin = useCallback((password: string): boolean => {
     if (password !== ADMIN_PASSWORD) {
       return false;
@@ -165,8 +204,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const item = menu.find((entry) => entry.getId() === itemId);
         if (!item) return prev;
         const next = cloneOrder(prev);
-        const added = next.addLine(item, options);
-        added.setQuantity(quantity);
+        next.addLine(item, options, quantity);
         persistCart(next);
         return next;
       });
@@ -183,10 +221,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const updateQuantity = useCallback((lineId: string, quantity: number) => {
+  const incrementLine = useCallback((lineId: string) => {
     setCart((prev) => {
       const next = cloneOrder(prev);
-      next.updateQuantity(lineId, quantity);
+      next.incrementLineQuantity(lineId);
+      persistCart(next);
+      return next;
+    });
+  }, []);
+
+  const decrementLine = useCallback((lineId: string) => {
+    setCart((prev) => {
+      const next = cloneOrder(prev);
+      next.decrementLineQuantity(lineId);
       persistCart(next);
       return next;
     });
@@ -198,22 +245,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const checkout = useCallback(
-    (customerName: string, method: "cash" | "qr"): PaymentReceipt => {
+    async (customerName: string, method: "cash" | "qr", slip?: string) => {
       if (cart.getLineCount() === 0) {
         throw new Error("ตะกร้าว่างเปล่า");
       }
-      cart.setCustomerName(customerName);
+      const active = cloneOrder(cart);
+      active.setCustomerName(customerName);
       const payment =
         method === "cash"
           ? new CashPayment(QueueCounter.getInstance())
           : new QRPayment(QueueCounter.getInstance());
-      const receipt = cart.checkout(payment);
-      const next = [...receipts, receipt];
+      const receipt = await active.checkout(payment);
+      const final = { ...receipt, slip: slip || undefined };
+      const next = [...receipts, final];
       persistOrders(next);
       setReceipts(next);
       setCart(new Order());
       persistCart(new Order());
-      return receipt;
+      return final;
     },
     [cart, receipts]
   );
@@ -243,11 +292,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateMenuItem = useCallback((oldId: string, draft: MenuDraft) => {
+    const newItem = makeMenuItem({ ...draft, id: oldId });
+    const clearOptions = !(newItem instanceof Drink);
     setMenu((prev) => {
       const next = prev.map((item) =>
-        item.getId() === oldId ? makeMenuItem({ ...draft, id: oldId }) : item
+        item.getId() === oldId ? newItem : item
       );
       persistMenu(next);
+      return next;
+    });
+    // ปรับรายการในตะกร้าที่อ้างถึงเมนูนี้ให้ตรงกับเมนูใหม่ด้วย
+    setCart((prev) => {
+      const next = cloneOrder(prev);
+      next.replaceMenuItemReferences(oldId, newItem, clearOptions);
+      persistCart(next);
       return next;
     });
   }, []);
@@ -256,6 +314,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setMenu((prev) => {
       const next = prev.filter((item) => item.getId() !== id);
       persistMenu(next);
+      return next;
+    });
+    setCart((prev) => {
+      const next = cloneOrder(prev);
+      next.removeLinesByItemId(id);
+      persistCart(next);
       return next;
     });
   }, []);
@@ -269,7 +333,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     logoutAdmin,
     addToCart,
     removeLine,
-    updateQuantity,
+    incrementLine,
+    decrementLine,
     getMenuItemById,
     checkout,
     toggleOrderCompleted,

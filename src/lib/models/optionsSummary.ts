@@ -13,9 +13,13 @@ const TOPPING_LABEL: Record<ToppingId, string> = {
 };
 
 export function summarizeOptions(options: DrinkOptions): string {
+  const sugar =
+    options.sweetnessPercent === 100
+      ? "ปกติ"
+      : `น้ำตาล ${options.sweetnessPercent}%`;
   const parts: string[] = [
     `${options.size} / ${TEMPERATURE_LABEL[options.temperature] ?? options.temperature}`,
-    `น้ำตาล ${options.sweetnessPercent}%`,
+    sugar,
   ];
   if (options.toppings.length > 0) {
     parts.push(options.toppings.map((id) => TOPPING_LABEL[id] ?? id).join(", "));

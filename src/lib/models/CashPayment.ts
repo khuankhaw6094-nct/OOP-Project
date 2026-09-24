@@ -3,15 +3,12 @@ import { QueueCounter } from "./QueueCounter";
 import type { PaymentResult } from "./types";
 
 export class CashPayment extends PaymentMethod {
-  private readonly counter: QueueCounter;
-
   constructor(counter: QueueCounter) {
-    super();
-    this.counter = counter;
+    super(counter);
   }
 
-  confirm(): PaymentResult {
-    const queueNumber = this.counter.nextNumber();
+  async confirm(): Promise<PaymentResult> {
+    const queueNumber = await this.counter.nextNumber();
     return {
       method: "cash",
       queueNumber,

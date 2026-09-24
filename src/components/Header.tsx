@@ -8,6 +8,7 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const onAdminPage = pathname.startsWith("/admin");
+  const onReadyPage = pathname.startsWith("/ready");
   const { cart, isAdmin, logoutAdmin } = useStore();
   const itemCount = cart.getItemCount();
 
@@ -26,24 +27,28 @@ export function Header() {
         </Link>
 
         <div className="header-actions">
-          {isAdmin ? (
+          <Link href="/cart" className="nav-link">
+            🧺 ตะกร้า
+            <span className="cart-badge">{itemCount}</span>
+          </Link>
+          {isAdmin && (
             <>
-              <Link href="/" className={`nav-link ${onAdminPage ? "" : "nav-link-active"}`}>
-                👥 หน้าร้านลูกค้า
+              <Link
+                href="/ready"
+                className={`nav-link ${onReadyPage ? "nav-link-active" : ""}`}
+              >
+                🖥️ จอเรียกคิว
               </Link>
-              <Link href="/admin" className={`nav-link ${onAdminPage ? "nav-link-active" : ""}`}>
+              <Link
+                href="/admin"
+                className={`nav-link ${onAdminPage ? "nav-link-active" : ""}`}
+              >
                 🛠️ แผงแอดมิน
               </Link>
               <button type="button" className="nav-link nav-link-btn" onClick={handleLogout}>
                 🚪 ออกจากระบบ
               </button>
             </>
-          ) : (
-            // ไม่มีลิงก์ไปหน้าแอดมินในหน้าลูกค้า — พนักงานเข้า /admin ด้วยการพิมพ์ URL ตรง
-            <Link href="/cart" className="nav-link">
-              🧺 ตะกร้า
-              <span className="cart-badge">{itemCount}</span>
-            </Link>
           )}
         </div>
       </div>

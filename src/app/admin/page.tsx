@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store/StoreProvider";
 import { CATEGORY_LABEL } from "@/lib/data/menu";
 import type { Category, MenuDraft } from "@/lib/models/types";
@@ -102,6 +103,7 @@ function AdminLogin() {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const {
     menu,
     receipts,
@@ -211,7 +213,14 @@ export default function AdminPage() {
         <span className="note">
           ลูกค้าไม่เห็นข้อมูลนี้ — ออกจากระบบเมื่อเลิกใช้งาน
         </span>
-        <button type="button" className="btn btn-sm" onClick={logoutAdmin}>
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={() => {
+            logoutAdmin();
+            router.push("/");
+          }}
+        >
           🚪 ออกจากระบบ
         </button>
       </div>
@@ -404,6 +413,14 @@ export default function AdminPage() {
 
       {tab === "orders" && (
         <>
+          <div className="actions-row" style={{ marginTop: 0 }}>
+            <Link href="/ready" className="btn btn-ghost">
+              🖥️ เปิดจอเรียกคิว
+            </Link>
+            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+              กดปุ่มเสร็จเรียบร้อยแล้ว เพื่อเรียกคิวถัดไป
+            </span>
+          </div>
           {receipts.length === 0 ? (
             <div className="empty-state">
               <span className="emoji">📭</span>
@@ -415,21 +432,10 @@ export default function AdminPage() {
                 const isDone = !!receipt.completed;
                 return (
                   <div
-                    className="order-row"
+                    className={`order-card ${
+                      isDone ? "order-card--done" : "order-card--pending"
+                    }`}
                     key={receipt.orderId}
-                    style={{
-                      background: isDone
-                        ? "#e5e7eb"
-                        : "rgba(34, 197, 94, 0.12)",
-                      border: isDone
-                        ? "1px solid #9ca3af"
-                        : "1px solid #22c55e",
-                      borderRadius: 12,
-                      padding: 12,
-                      transition: "background 0.2s ease, border-color 0.2s ease",
-                      textDecoration: isDone ? "line-through" : "none",
-                      color: isDone ? "#6b7280" : "inherit",
-                    }}
                   >
                     <div className="head">
                       <div>
@@ -460,6 +466,16 @@ export default function AdminPage() {
                         </div>
                       ))}
                     </div>
+                    {receipt.slip && (
+                      <div style={{ marginTop: 8 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={receipt.slip}
+                          alt="สลิปโอนเงิน"
+                          className="slip-thumb"
+                        />
+                      </div>
+                    )}
                     <div
                       className="receipt-footer"
                       style={{ display: "flex", justifyContent: "space-between" }}

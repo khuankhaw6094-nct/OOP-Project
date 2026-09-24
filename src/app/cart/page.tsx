@@ -7,7 +7,7 @@ import { MenuImage } from "@/components/MenuImage";
 import { formatBaht } from "@/lib/format";
 
 export default function CartPage() {
-  const { cart, removeLine, updateQuantity } = useStore();
+  const { cart, removeLine, incrementLine, decrementLine } = useStore();
   const lines = cart.getLines();
   const total = cart.getTotal();
 
@@ -50,21 +50,21 @@ export default function CartPage() {
                       ราคาต่อหน่วย {formatBaht(unitPrice)}
                     </div>
                   </div>
-                  <div className="qty-stepper">
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(line.getId(), line.getQuantity() - 1)}
-                    >
-                      −
-                    </button>
-                    <span className="qty">{line.getQuantity()}</span>
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(line.getId(), line.getQuantity() + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
+<div className="qty-stepper">
+                      <button
+                        type="button"
+                        onClick={() => decrementLine(line.getId())}
+                      >
+                        −
+                      </button>
+                      <span className="qty">{line.getQuantity()}</span>
+                      <button
+                        type="button"
+                        onClick={() => incrementLine(line.getId())}
+                      >
+                        +
+                      </button>
+                    </div>
                   <div className="line-total">{formatBaht(line.getLineTotal())}</div>
                   <button
                     type="button"

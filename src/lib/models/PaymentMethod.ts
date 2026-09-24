@@ -1,7 +1,10 @@
+import { QueueCounter } from "./QueueCounter";
 import type { PaymentResult } from "./types";
 
 export abstract class PaymentMethod {
-  abstract confirm(): PaymentResult;
+  protected constructor(protected readonly counter: QueueCounter) {}
+
+  abstract confirm(): Promise<PaymentResult>;
 
   abstract getLabel(): string;
 }

@@ -46,8 +46,13 @@ export default function ReceiptPage() {
           <>
             <div className="queue-number">#{receipt.queueNumber}</div>
             <div className="queue-label">
-              รอรับสินค้าที่เคาน์เตอร์ ⏳ ใช้ชื่อลูกค้าในการเรียก
+              รอรับสินค้าที่เคาน์เตอร์ ⏳ ระบบจะเรียกตามเลขคิวนี้
             </div>
+            {receipt.refCode && (
+              <div style={{ textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
+                Ref: {receipt.refCode}
+              </div>
+            )}
           </>
         ) : (
           <div style={{ textAlign: "center", margin: "8px 0 12px" }}>
@@ -86,6 +91,15 @@ export default function ReceiptPage() {
             <span>รวมทั้งหมด</span>
             <span style={{ fontWeight: 800 }}>{formatBaht(receipt.total)}</span>
           </div>
+          {receipt.slip && (
+            <div style={{ textAlign: "center", marginTop: 12 }}>
+              <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 6 }}>
+                สลิปโอนเงินที่แนบมา
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={receipt.slip} alt="สลิปโอนเงิน" className="slip-thumb" />
+            </div>
+          )}
           <div style={{ textAlign: "center", marginTop: 10, fontSize: 13, color: "var(--ink-soft)" }}>
             ขอบคุณที่ใช้บริการ ☕
           </div>

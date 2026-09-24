@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/lib/store/StoreProvider";
 import { MockQr } from "@/components/MockQr";
+import { resizeImage } from "@/lib/image";
 import { formatBaht } from "@/lib/format";
 
 type PayMethod = "cash" | "qr";
@@ -17,39 +18,47 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // สลิปโอนเงิน — เก็บไว้ชั่วคราวในหน้านี้เท่านั้น ไม่บันทึกถาวร
-  const [slipPreview, setSlipPreview] = useState<string | null>(null);
+  // สลิปโอนเงิน — บีบอัดเป็น data URL เล็ก ๆ แล้วเก็บกับใบเสร็จ (บันทึกถาวรใน localStorage)
+  const [slipData, setSlipData] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const submitTimerRef = useRef<number | null>(null);
 
+  // เคลียร์ timer ยืนยันคำสั่งซื้อเมื่อออกจากหน้า ป้องกันออเดอร์หลุดจากที่กดไปแล้ว
   useEffect(() => {
     return () => {
-      if (slipPreview) {
-        URL.revokeObjectURL(slipPreview);
+      if (submitTimerRef.current !== null) {
+        window.clearTimeout(submitTimerRef.current);
       }
     };
-  }, [slipPreview]);
+  }, []);
 
-  // ถ้าสลับกลับไปจ่ายเงินสด เคลียร์สลิปทิ้ง เผื่อกลับมาเลือก QR ใหม่ภายหลัง
-  useEffect(() => {
-    if (method === "cash" && slipPreview) {
-      URL.revokeObjectURL(slipPreview);
-      setSlipPreview(null);
+  function selectMethod(next: PayMethod) {
+    if (next === "cash" && slipData) {
+      setSlipData(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method]);
+    setMethod(next);
+  }
 
-  const handleSlipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleSlipChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
-    if (slipPreview) URL.revokeObjectURL(slipPreview);
-    setSlipPreview(URL.createObjectURL(file));
-    setError("");
-  };
+    if (!file.type.startsWith("image/")) {
+      setError("กรุณาเลือกไฟล์รูปภาพสำหรับสลิปเท่านั้น");
+      return;
+    }
+    try {
+      const dataUrl = await resizeImage(file, 480);
+      setSlipData(dataUrl);
+      setError("");
+    } catch {
+      setError("อ่านรูปสลิปไม่สำเร็จ ลองเลือกไฟล์ใหม่");
+    }
+  }
 
   const handleRemoveSlip = () => {
-    if (slipPreview) URL.revokeObjectURL(slipPreview);
-    setSlipPreview(null);
+    setSlipData(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -59,27 +68,29 @@ export default function CheckoutPage() {
     name.trim().length > 0 &&
     cart.getLineCount() > 0 &&
     !processing &&
-    (!needsSlip || !!slipPreview);
+    (!needsSlip || !!slipData);
 
   function handleSubmit() {
     if (!name.trim()) {
       setError("กรุณากรอกชื่อลูกค้าก่อนสั่ง");
       return;
     }
-    if (needsSlip && !slipPreview) {
+    if (needsSlip && !slipData) {
       setError("กรุณาแนบสลิปโอนเงินก่อนยืนยัน");
       return;
     }
     setProcessing(true);
     setError("");
-    window.setTimeout(() => {
-      try {
-        const receipt = checkout(name.trim(), method);
-        router.push(`/receipt/${receipt.orderId}`);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด ลองใหม่");
-        setProcessing(false);
-      }
+    submitTimerRef.current = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const receipt = await checkout(name.trim(), method, slipData ?? undefined);
+          router.push(`/receipt/${receipt.orderId}`);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด ลองใหม่");
+          setProcessing(false);
+        }
+      })();
     }, 600);
   }
 
@@ -118,7 +129,8 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 className={`payment-option ${method === "cash" ? "active" : ""}`}
-                onClick={() => setMethod("cash")}
+                disabled={processing}
+                onClick={() => selectMethod("cash")}
               >
                 <span className="emoji">💵</span>
                 <span>
@@ -129,7 +141,8 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 className={`payment-option ${method === "qr" ? "active" : ""}`}
-                onClick={() => setMethod("qr")}
+                disabled={processing}
+                onClick={() => selectMethod("qr")}
               >
                 <span className="emoji">📱</span>
                 <span>
@@ -160,13 +173,14 @@ export default function CheckoutPage() {
                 }}
               >
                 <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 8 }}>
-                  แนบสลิปโอนเงิน
+                  แนบสลิปโอนเงิน (ไฟล์รูปภาพเท่านั้น)
                 </div>
 
-                {slipPreview ? (
+                {slipData ? (
                   <div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={slipPreview}
+                      src={slipData}
                       alt="สลิปโอนเงิน"
                       style={{
                         maxWidth: "100%",
@@ -199,7 +213,7 @@ export default function CheckoutPage() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  onChange={handleSlipChange}
+                  onChange={(e) => void handleSlipChange(e)}
                   style={{ display: "none" }}
                 />
               </div>

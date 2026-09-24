@@ -2,6 +2,7 @@ export { MenuItem } from "./MenuItem";
 export type { MenuItemArgs } from "./MenuItem";
 export { Drink, DRINK_TOPPINGS } from "./Drink";
 export { FoodItem } from "./FoodItem";
+export { BakeryItem } from "./BakeryItem";
 export { OrderLine } from "./OrderLine";
 export { Order } from "./Order";
 export type { OrderStatus } from "./Order";

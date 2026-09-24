@@ -13,8 +13,8 @@ function cloneOptions(options: DrinkOptions): DrinkOptions {
 
 export class OrderLine {
   private readonly id: string;
-  private readonly menuItem: MenuItem;
-  private readonly selectedOptions: DrinkOptions | null;
+  private menuItem: MenuItem;
+  private selectedOptions: DrinkOptions | null;
   private quantity: number;
 
   constructor(menuItem: MenuItem, options: DrinkOptions | null = null, quantity = 1, id?: string) {
@@ -54,5 +54,12 @@ export class OrderLine {
 
   setQuantity(quantity: number): void {
     this.quantity = Math.max(1, quantity);
+  }
+
+  setMenuItem(menuItem: MenuItem, clearOptions: boolean): void {
+    this.menuItem = menuItem;
+    if (clearOptions) {
+      this.selectedOptions = null;
+    }
   }
 }

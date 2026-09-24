@@ -847,3 +847,106 @@ a.menu-card:hover {
 .app-loading-inner .emoji {
   font-size: 40px;
 }
+
+/* ---------- Admin order cards ---------- */
+.order-card {
+  border-radius: 12px;
+  padding: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.order-card--pending {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid var(--success);
+}
+
+.order-card--done {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}
+
+.order-card--done .head {
+  text-decoration: line-through;
+}
+
+/* ---------- Slip thumbnail ---------- */
+.slip-thumb {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin: 0 auto;
+}
+
+/* ---------- Queue/Ready screen ---------- */
+.ready-board {
+  text-align: center;
+  padding: 28px 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--brand), var(--brand-hover));
+  color: #fff;
+}
+
+.ready-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.ready-number {
+  font-size: 110px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 8px 0;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.ready-label {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.ready-waiting {
+  margin-top: 20px;
+}
+
+.ready-waiting-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink-soft);
+}
+
+.queue-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.queue-tile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--surface);
+}
+
+.queue-tile-number {
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--brand);
+}
+
+.queue-tile-name {
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.queue-tile-meta {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}

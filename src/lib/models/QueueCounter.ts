@@ -1,4 +1,5 @@
 const STORAGE_KEY = "grindco_queue_next";
+const LOCK_NAME = "grindco_queue_lock";
 
 function readNext(): number {
   if (typeof window === "undefined") return 1;
@@ -14,11 +15,8 @@ function persistNext(value: number): void {
 
 export class QueueCounter {
   private static instance: QueueCounter | null = null;
-  private next: number;
 
-  private constructor() {
-    this.next = readNext();
-  }
+  private constructor() {}
 
   static getInstance(): QueueCounter {
     if (!QueueCounter.instance) {
@@ -27,10 +25,19 @@ export class QueueCounter {
     return QueueCounter.instance;
   }
 
-  nextNumber(): number {
-    const value = this.next;
-    this.next += 1;
-    persistNext(this.next);
-    return value;
+  private async withLock<T>(fn: () => T | Promise<T>): Promise<T> {
+    if (typeof navigator !== "undefined" && navigator.locks) {
+      return navigator.locks.request(LOCK_NAME, async () => fn());
+    }
+    return fn();
+  }
+
+  async nextNumber(): Promise<number> {
+    // อ่านค่าใหม่จาก localStorage ภายใต้ cross-tab lock กันเลขคิวซ้ำกันเมื่อเปิดหลายแท็บ
+    return this.withLock(() => {
+      const next = readNext();
+      persistNext(next + 1);
+      return next;
+    });
   }
 }

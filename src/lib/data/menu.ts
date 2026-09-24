@@ -1,5 +1,6 @@
 import { Drink } from "@/lib/models/Drink";
 import { FoodItem } from "@/lib/models/FoodItem";
+import { BakeryItem } from "@/lib/models/BakeryItem";
 import { MenuItem } from "@/lib/models/MenuItem";
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -109,7 +110,7 @@ export function createDefaultMenu(): MenuItem[] {
       basePrice: 95,
       category: "food",
     }),
-    new FoodItem({
+    new BakeryItem({
       id: "butter-croissant",
       name: "Butter Croissant",
       description: "เนยหอม ชั้นกรอบละลายในปาก",
@@ -118,7 +119,7 @@ export function createDefaultMenu(): MenuItem[] {
       basePrice: 55,
       category: "bakery",
     }),
-    new FoodItem({
+    new BakeryItem({
       id: "choco-chip-cookie",
       name: "Choco Chip Cookie",
       description: "คุกกี้นุ่มหนึบ ช็อกชิปทะลัก",
@@ -127,7 +128,7 @@ export function createDefaultMenu(): MenuItem[] {
       basePrice: 45,
       category: "bakery",
     }),
-    new FoodItem({
+    new BakeryItem({
       id: "cinnamon-roll",
       name: "Cinnamon Roll",
       description: "โรลซินนามอน ไอซิงหวานหอม",
@@ -136,7 +137,7 @@ export function createDefaultMenu(): MenuItem[] {
       basePrice: 65,
       category: "bakery",
     }),
-    new FoodItem({
+    new BakeryItem({
       id: "banana-bread",
       name: "Banana Bread",
       description: "ขนมปังกล้วยหอมนุ่ม หวานธรรมชาติ",
