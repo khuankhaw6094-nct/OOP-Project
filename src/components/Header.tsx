@@ -26,10 +26,13 @@ export function Header() {
         </Link>
 
         <div className="header-actions">
-          <Link href="/cart" className="nav-link">
-            🧺 ตะกร้า
-            <span className="cart-badge">{itemCount}</span>
-          </Link>
+          {/* แอดมินสั่งซื้อไม่ได้ (/cart ถูกบล็อก) จึงไม่แสดงปุ่มตะกร้าในโหมดแอดมิน */}
+          {!isAdmin && (
+            <Link href="/cart" className="nav-link">
+              🧺 ตะกร้า
+              <span className="cart-badge">{itemCount}</span>
+            </Link>
+          )}
           {isAdmin && (
             <>
               <Link
