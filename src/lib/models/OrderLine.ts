@@ -11,6 +11,12 @@ function cloneOptions(options: DrinkOptions): DrinkOptions {
   };
 }
 
+// กันจำนวนติด NaN/Infinity/ค่าที่ไม่ใช่ตัวเลข (เช่นถ้าวันหลังมีช่องให้พิมพ์จำนวนเอง)
+function sanitizeQuantity(value: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 1;
+  return Math.max(1, value);
+}
+
 export class OrderLine {
   private readonly id: string;
   private menuItem: MenuItem;
@@ -21,7 +27,7 @@ export class OrderLine {
     this.id = id ?? createId("line");
     this.menuItem = menuItem;
     this.selectedOptions = options ? cloneOptions(options) : null;
-    this.quantity = Math.max(1, quantity);
+    this.quantity = sanitizeQuantity(quantity);
   }
 
   getId(): string {
@@ -45,15 +51,15 @@ export class OrderLine {
   }
 
   incrementQuantity(): void {
-    this.quantity += 1;
+    this.quantity = sanitizeQuantity(this.quantity + 1);
   }
 
   decrementQuantity(): void {
-    this.quantity = Math.max(1, this.quantity - 1);
+    this.quantity = sanitizeQuantity(this.quantity - 1);
   }
 
   setQuantity(quantity: number): void {
-    this.quantity = Math.max(1, quantity);
+    this.quantity = sanitizeQuantity(quantity);
   }
 
   setMenuItem(menuItem: MenuItem, clearOptions: boolean): void {
