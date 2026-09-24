@@ -39,15 +39,11 @@ export function Header() {
               </button>
             </>
           ) : (
-            <>
-              <Link href="/cart" className="nav-link">
-                🧺 ตะกร้า
-                <span className="cart-badge">{itemCount}</span>
-              </Link>
-              <Link href="/admin" className="nav-link nav-link-staff">
-                🔐 สำหรับพนักงาน
-              </Link>
-            </>
+            // ไม่มีลิงก์ไปหน้าแอดมินในหน้าลูกค้า — พนักงานเข้า /admin ด้วยการพิมพ์ URL ตรง
+            <Link href="/cart" className="nav-link">
+              🧺 ตะกร้า
+              <span className="cart-badge">{itemCount}</span>
+            </Link>
           )}
         </div>
       </div>

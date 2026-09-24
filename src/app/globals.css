@@ -151,11 +151,6 @@ a.nav-link:hover {
   color: #fff;
 }
 
-.nav-link-staff {
-  background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.45);
-}
-
 .cart-badge {
   background: var(--accent);
   color: #fff;
