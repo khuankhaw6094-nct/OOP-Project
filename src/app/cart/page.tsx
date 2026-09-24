@@ -4,12 +4,15 @@ import Link from "next/link";
 import { useStore } from "@/lib/store/StoreProvider";
 import { summarizeOptions } from "@/lib/models";
 import { MenuImage } from "@/components/MenuImage";
+import { CustomerOnlyNotice } from "@/components/AdminOrderBlock";
 import { formatBaht } from "@/lib/format";
 
 export default function CartPage() {
-  const { cart, removeLine, incrementLine, decrementLine } = useStore();
+  const { cart, removeLine, incrementLine, decrementLine, isAdmin } = useStore();
   const lines = cart.getLines();
   const total = cart.getTotal();
+
+  if (isAdmin) return <CustomerOnlyNotice />;
 
   return (
     <div>

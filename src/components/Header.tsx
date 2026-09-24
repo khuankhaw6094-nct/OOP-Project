@@ -8,7 +8,6 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const onAdminPage = pathname.startsWith("/admin");
-  const onReadyPage = pathname.startsWith("/ready");
   const { cart, isAdmin, logoutAdmin } = useStore();
   const itemCount = cart.getItemCount();
 
@@ -33,12 +32,6 @@ export function Header() {
           </Link>
           {isAdmin && (
             <>
-              <Link
-                href="/ready"
-                className={`nav-link ${onReadyPage ? "nav-link-active" : ""}`}
-              >
-                🖥️ จอเรียกคิว
-              </Link>
               <Link
                 href="/admin"
                 className={`nav-link ${onAdminPage ? "nav-link-active" : ""}`}

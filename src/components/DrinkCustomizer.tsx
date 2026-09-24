@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Drink, DRINK_TOPPINGS, SIZE_PRICES } from "@/lib/models/Drink";
 import type { DrinkOptions, Size, Temperature, ToppingId } from "@/lib/models/types";
 import { useStore } from "@/lib/store/StoreProvider";
+import { AdminNoOrderHint } from "@/components/AdminOrderBlock";
 import { formatBaht } from "@/lib/format";
 
 const TEMPERATURES: { value: Temperature; label: string; emoji: string }[] = [
@@ -16,7 +17,7 @@ const SWEETNESS: number[] = [0, 25, 50, 75, 100];
 
 export function DrinkCustomizer({ item }: { item: Drink }) {
   const router = useRouter();
-  const { addToCart } = useStore();
+  const { addToCart, isAdmin } = useStore();
 
   const [options, setOptions] = useState<DrinkOptions>(() =>
     item.getDefaultOptions()
@@ -53,7 +54,7 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
   const price = item.getPrice(options);
 
   function handleAdd() {
-    if (addingRef.current) return;
+    if (isAdmin || addingRef.current) return;
     addingRef.current = true;
     addToCart(item.getId(), options, quantity);
     setShowToast(true);
@@ -170,11 +171,12 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
         <button
           type="button"
           className="btn btn-accent btn-block"
-          disabled={showToast}
+          disabled={showToast || isAdmin}
           onClick={handleAdd}
         >
           เพิ่ม {quantity} แก้วลงตะกร้า · {formatBaht(price * quantity)}
         </button>
+        {isAdmin && <AdminNoOrderHint />}
       </div>
 
       {showToast && <div className="toast">เพิ่มลงตะกร้าแล้ว ✓</div>}

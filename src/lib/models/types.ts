@@ -23,12 +23,6 @@ export interface Topping {
   price: number;
 }
 
-export interface SizePrice {
-  size: Size;
-  label: string;
-  delta: number;
-}
-
 export interface PaymentResult {
   method: "cash" | "qr";
   queueNumber: number | null;

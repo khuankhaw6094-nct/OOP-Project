@@ -77,7 +77,12 @@ export function persistMenu(items: MenuItem[]): void {
       ...item,
       image: item.image.startsWith("data:") ? "" : item.image,
     }));
-    window.localStorage.setItem(MENU_KEY, JSON.stringify(slim));
+    try {
+      window.localStorage.setItem(MENU_KEY, JSON.stringify(slim));
+    } catch {
+      // storage เต็มจริง ๆ (เช่นออเดอร์+สลิปกินพื้นที่หมด) — ห้าม throw ออกไปจาก setMenu updater
+      // ไม่งั้นทั้งแอปพัง เมนูในหน้าจอยังใช้ได้ แค่จะไม่ถูกบันทึกจนกว่าจะมีพื้นที่ว่าง
+    }
   }
 }
 

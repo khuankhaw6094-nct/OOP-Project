@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/lib/store/StoreProvider";
 import { MockQr } from "@/components/MockQr";
+import { CustomerOnlyNotice } from "@/components/AdminOrderBlock";
 import { resizeImage } from "@/lib/image";
 import { formatBaht } from "@/lib/format";
 
@@ -12,7 +13,7 @@ type PayMethod = "cash" | "qr";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, checkout } = useStore();
+  const { cart, checkout, isAdmin } = useStore();
   const [name, setName] = useState("");
   const [method, setMethod] = useState<PayMethod>("cash");
   const [error, setError] = useState("");
@@ -93,6 +94,8 @@ export default function CheckoutPage() {
       })();
     }, 600);
   }
+
+  if (isAdmin) return <CustomerOnlyNotice />;
 
   return (
     <div>

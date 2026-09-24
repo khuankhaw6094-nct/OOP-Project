@@ -175,7 +175,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // ซิงค์ข้อมูลระหว่างแท็บ: ถ้าอีกแท็บแก้เมนู/ออเดอร์/สถานะแอดมิน แท็บนี้จะโหลดใหม่ทันที
   useEffect(() => {
     function onStorage(event: StorageEvent) {
-      if (event.key === MENU_KEY) setMenu(loadMenu());
+      if (event.key === MENU_KEY) {
+        setMenu(loadMenu());
+        // แก้ราคา/ชื่อเมนูไม่ทำให้ JSON ตะกร้าเปลี่ยน (ไม่มี event ของ CART_KEY) — ต้องผูกตะกร้ากับเมนูใหม่เอง
+        setCart(restoreCart(loadMenu()));
+      }
       if (event.key === CART_KEY) setCart(restoreCart(loadMenu()));
       if (event.key === ORDERS_KEY) setReceipts(loadReceipts());
       if (event.key === ADMIN_KEY) setIsAdmin(loadAdminState());

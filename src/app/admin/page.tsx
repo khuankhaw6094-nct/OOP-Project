@@ -210,9 +210,6 @@ export default function AdminPage() {
         <span className="title">
           🛡️ โหมดแอดมิน (เฉพาะพนักงาน)
         </span>
-        <span className="note">
-          ลูกค้าไม่เห็นข้อมูลนี้ — ออกจากระบบเมื่อเลิกใช้งาน
-        </span>
         <button
           type="button"
           className="btn btn-sm"
@@ -413,14 +410,6 @@ export default function AdminPage() {
 
       {tab === "orders" && (
         <>
-          <div className="actions-row" style={{ marginTop: 0 }}>
-            <Link href="/ready" className="btn btn-ghost">
-              🖥️ เปิดจอเรียกคิว
-            </Link>
-            <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-              กดปุ่มเสร็จเรียบร้อยแล้ว เพื่อเรียกคิวถัดไป
-            </span>
-          </div>
           {receipts.length === 0 ? (
             <div className="empty-state">
               <span className="emoji">📭</span>

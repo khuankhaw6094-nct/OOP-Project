@@ -7,12 +7,13 @@ import { Drink } from "@/lib/models/Drink";
 import { useStore } from "@/lib/store/StoreProvider";
 import { DrinkCustomizer } from "@/components/DrinkCustomizer";
 import { MenuImage } from "@/components/MenuImage";
+import { AdminNoOrderHint } from "@/components/AdminOrderBlock";
 import { formatBaht } from "@/lib/format";
 
 export default function ItemPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { getMenuItemById, addToCart } = useStore();
+  const { getMenuItemById, addToCart, isAdmin } = useStore();
   const [quantity, setQuantity] = useState(1);
   const [showToast, setShowToast] = useState(false);
   // กันกดซ้ำระหว่างรอพาไปหน้าตะกร้า (ไม่งั้นดับเบิลคลิกจะได้ 2 รายการ)
@@ -38,7 +39,7 @@ export default function ItemPage() {
   const isDrink = item instanceof Drink;
 
   function handleAddFood() {
-    if (addingRef.current) return;
+    if (isAdmin || addingRef.current) return;
     addingRef.current = true;
     addToCart(safeItem.getId(), undefined, quantity);
     setShowToast(true);
@@ -96,11 +97,12 @@ export default function ItemPage() {
             <button
               type="button"
               className="btn btn-accent btn-block"
-              disabled={showToast}
+              disabled={showToast || isAdmin}
               onClick={handleAddFood}
             >
               เพิ่มลงตะกร้า · {formatBaht(item.getPrice() * quantity)}
             </button>
+            {isAdmin && <AdminNoOrderHint />}
             {showToast && <div className="toast">เพิ่มลงตะกร้าแล้ว ✓</div>}
           </div>
         )}
