@@ -16,7 +16,7 @@
 
 - **Encapsulation** — ฟิลด์ทุกตัวเป็น private, เรียกผ่าน getter
 - **Inheritance** — `MenuItem` > `Drink` / `FoodItem` > `BakeryItem`
-- **Polymorphism** — `getPrice()`, `customize()`, `confirm()` overridden ในคลาสลูก
+- **Polymorphism** — `getPrice()` (Drink คิดราคาตามตัวเลือกขนาด/ท็อปปิ้ง, FoodItem คืนราคาฐาน) และ `confirm()` (CashPayment / QRPayment) overridden ในคลาสลูก
 - **Composition** — `OrderLine` สร้างสำเนา options ของตัวเอง (ห้าม mutate ข้อมูลต้นทาง)
 - **Singleton** — `QueueCounter` สำหรับเลขคิว (กันเลขซ้ำข้ามแท็บด้วย Web Locks API)
 - **Interface + Abstract class** — `PaymentMethod` (CashPayment / QRPayment)

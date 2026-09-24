@@ -47,7 +47,7 @@ function deserializeMenu(raw: string | null): MenuItem[] | null {
   if (!raw) return null;
   try {
     const list: SerializedMenuItem[] = JSON.parse(raw);
-    if (!Array.isArray(list) || list.length === 0) return null;
+    if (!Array.isArray(list)) return null;
     return list.map(buildItem);
   } catch {
     return null;
