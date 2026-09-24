@@ -1,17 +1,18 @@
 import { MenuItem } from "./MenuItem";
 import type { MenuItemArgs } from "./MenuItem";
-import type { DrinkOptions, Size, Temperature, Topping, ToppingId } from "./types";
-
-const SIZE_PRICES: SizePriceLike[] = [
-  { size: "S", delta: 0 },
-  { size: "M", delta: 15 },
-  { size: "L", delta: 30 },
-];
+import type { DrinkOptions, Size, Topping } from "./types";
 
 interface SizePriceLike {
   size: Size;
   delta: number;
 }
+
+// ใช้ทั้งคิดราคา (getPrice) และแสดงป้าย "+15" ในหน้าปรับแต่ง — แก้ราคาขนาดที่นี่ที่เดียว
+export const SIZE_PRICES: SizePriceLike[] = [
+  { size: "S", delta: 0 },
+  { size: "M", delta: 15 },
+  { size: "L", delta: 30 },
+];
 
 export const DRINK_TOPPINGS: Topping[] = [
   { id: "extra-shot", name: "เพิ่มช็อต", price: 20 },
@@ -20,7 +21,7 @@ export const DRINK_TOPPINGS: Topping[] = [
   { id: "vanilla-syrup", name: "ไซรัปวานิลลา", price: 15 },
 ];
 
-export class Drink extends MenuItem {
+export class Drink extends MenuItem<DrinkOptions> {
   constructor(args: MenuItemArgs) {
     super(args);
   }
@@ -45,32 +46,5 @@ export class Drink extends MenuItem {
       return sum + (topping ? topping.price : 0);
     }, 0);
     return this.getBasePrice() + sizeDelta + toppingTotal;
-  }
-
-  customize(size: Size): DrinkOptions;
-  customize(size: Size, temperature: Temperature): DrinkOptions;
-  customize(
-    size: Size,
-    temperature: Temperature,
-    sweetnessPercent: number
-  ): DrinkOptions;
-  customize(
-    size: Size,
-    temperature: Temperature,
-    sweetnessPercent: number,
-    toppings: ToppingId[]
-  ): DrinkOptions;
-  customize(
-    size: Size,
-    temperature: Temperature = "cold",
-    sweetnessPercent: number = 100,
-    toppings: ToppingId[] = []
-  ): DrinkOptions {
-    return {
-      size,
-      temperature,
-      sweetnessPercent,
-      toppings: [...toppings],
-    };
   }
 }

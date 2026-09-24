@@ -1,4 +1,4 @@
-import type { Category, DrinkOptions } from "./types";
+import type { Category } from "./types";
 
 export interface MenuItemArgs {
   id: string;
@@ -10,7 +10,8 @@ export interface MenuItemArgs {
   image: string;
 }
 
-export abstract class MenuItem {
+// TOptions = ชนิดตัวเลือกที่คลาสลูกแต่ละตัวรับเอง (เช่น Drink ใช้ DrinkOptions) — คลาสแม่ไม่ต้องรู้จักรายละเอียด
+export abstract class MenuItem<TOptions = unknown> {
   private readonly id: string;
   private readonly name: string;
   private readonly description: string;
@@ -57,5 +58,5 @@ export abstract class MenuItem {
     return this.category;
   }
 
-  abstract getPrice(options?: DrinkOptions): number;
+  abstract getPrice(options?: TOptions): number;
 }

@@ -2,16 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Drink, DRINK_TOPPINGS } from "@/lib/models/Drink";
+import { Drink, DRINK_TOPPINGS, SIZE_PRICES } from "@/lib/models/Drink";
 import type { DrinkOptions, Size, Temperature, ToppingId } from "@/lib/models/types";
 import { useStore } from "@/lib/store/StoreProvider";
 import { formatBaht } from "@/lib/format";
-
-const SIZES: { value: Size; label: string; delta: number }[] = [
-  { value: "S", label: "S", delta: 0 },
-  { value: "M", label: "M", delta: 15 },
-  { value: "L", label: "L", delta: 30 },
-];
 
 const TEMPERATURES: { value: Temperature; label: string; emoji: string }[] = [
   { value: "hot", label: "ร้อน", emoji: "🔥" },
@@ -74,13 +68,13 @@ export function DrinkCustomizer({ item }: { item: Drink }) {
         <div className="option-group">
           <div className="option-group-title">ขนาด (เลือก 1 อย่าง)</div>
           <div className="chips">
-            {SIZES.map((size) => (
+            {SIZE_PRICES.map((size) => (
               <button
-                key={size.value}
-                className={`chip ${options.size === size.value ? "active" : ""}`}
-                onClick={() => setSize(size.value)}
+                key={size.size}
+                className={`chip ${options.size === size.size ? "active" : ""}`}
+                onClick={() => setSize(size.size)}
               >
-                {size.label}
+                {size.size}
                 <span className="sub"> (+{size.delta})</span>
               </button>
             ))}
