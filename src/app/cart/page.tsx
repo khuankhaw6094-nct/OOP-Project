@@ -32,7 +32,6 @@ export default function CartPage() {
               const item = line.getMenuItem();
               const options = line.getSelectedOptions();
               const unitPrice = item.getPrice(options ?? undefined);
-              const missing = item.getId().startsWith("missing_");
               return (
                 <div className="cart-line" key={line.getId()}>
                   <MenuImage
@@ -73,11 +72,6 @@ export default function CartPage() {
                   >
                     ลบ
                   </button>
-                  {missing && (
-                    <span style={{ fontSize: 12, color: "var(--danger)" }}>
-                      สินค้าบกพร่อง
-                    </span>
-                  )}
                 </div>
               );
             })}
