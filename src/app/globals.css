@@ -236,7 +236,7 @@ a.nav-link:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  /* เนื้อหาสูงสุด: padding 36 + รูป 180 + ชื่อ 26 + คำอธิบาย 2 บรรทัด 40 + แถวราคา 37 + gap 18 ≈ 339 → เผื่อ ~10 */
+  /* เนื้อหาสูงสุด (วัดจริง 336.4): border 2 + padding 36 + รูป 180 + ชื่อ 29.5 + คำอธิบาย 2 บรรทัด 40.3 + แถวราคา 31 + gap 18 ≈ 337 → เผื่อ ~13 */
   min-height: 350px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -266,7 +266,7 @@ a.menu-card:hover {
 }
 
 .menu-card .name {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 800;
 }
 
@@ -293,9 +293,9 @@ a.menu-card:hover {
   color: var(--accent-hover);
 }
 
-/* ราคาบนการ์ดเมนูให้เด่นขึ้น (หน้ารายละเอียดยังใช้ 18px ตามเดิม) */
+/* ราคาบนการ์ดเมนูใหญ่กว่าปกติเล็กน้อย แต่ไม่แย่งซีนชื่อเมนู (หน้ารายละเอียดยังใช้ 18px ตามเดิม) */
 .menu-card .price {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 /* ป้ายท้ายการ์ดเมนู — เป็นข้อความกำกับ ไม่ใช่ปุ่ม (ทั้งการ์ดคลิกไปหน้ารายละเอียดได้อยู่แล้ว) */

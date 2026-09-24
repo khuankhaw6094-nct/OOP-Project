@@ -158,7 +158,9 @@ export default function AdminPage() {
     setFormError("");
   }
 
-  function handleDelete(id: string) {
+  function handleDelete(id: string, name: string) {
+    // กด "ยกเลิก" — ไม่ลบอะไรเลย
+    if (!window.confirm(`ยืนยันลบเมนู "${name}" ใช่หรือไม่?`)) return;
     deleteMenuItem(id);
     // ลบเมนูที่กำลังแก้ไขอยู่ — ออกจากโหมดแก้ไข ไม่ให้ฟอร์มค้างข้อมูลของเมนูที่ไม่มีแล้ว
     if (editingId === id) resetForm();
@@ -389,7 +391,7 @@ export default function AdminPage() {
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(item.getId())}
+                    onClick={() => handleDelete(item.getId(), item.getName())}
                   >
                     ลบ
                   </button>
