@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store/StoreProvider";
 import { CATEGORY_LABEL } from "@/lib/data/menu";
-import type { Category, MenuDraft } from "@/lib/models/types";
+import type { Category, MenuDraft, PaymentReceipt } from "@/lib/models/types";
 import { MenuImage } from "@/components/MenuImage";
 import { resizeImage } from "@/lib/image";
 import { formatBaht, formatDateTime } from "@/lib/format";
@@ -14,6 +14,20 @@ import { formatBaht, formatDateTime } from "@/lib/format";
 const CATEGORIES: Category[] = ["drink", "food", "bakery"];
 
 type AdminTab = "menu" | "orders";
+
+const TOGGLE_COOLDOWN_MS = 700;
+
+// ออเดอร์ที่ยังไม่เสร็จอยู่บนสุด (ใหม่ก่อน), ออเดอร์ที่เสร็จแล้วอยู่ล่างสุด
+function sortReceiptIds(receipts: PaymentReceipt[]): string[] {
+  return [...receipts]
+    .sort((a, b) => {
+      const aDone = !!a.completed;
+      const bDone = !!b.completed;
+      if (aDone !== bDone) return aDone ? 1 : -1;
+      return b.timestamp - a.timestamp;
+    })
+    .map((receipt) => receipt.orderId);
+}
 
 const EMPTY_DRAFT: MenuDraft = {
   name: "",
@@ -121,6 +135,31 @@ export default function AdminPage() {
   const [uploadError, setUploadError] = useState("");
   const [formError, setFormError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastToggleRef = useRef({ orderId: "", at: 0 });
+
+  // ลำดับการ์ดออเดอร์ถูก "แช่" ไว้ — กดเสร็จ/ยังไม่ได้ทำแล้วการ์ดอยู่ที่เดิม เปลี่ยนแค่สี
+  // (เดิมเรียงใหม่ทันทีที่กด การ์ดถัดไปเลื่อนขึ้นมาใต้เมาส์ คลิกซ้ำจึงไปโดนออเดอร์อื่นโดยไม่ตั้งใจ)
+  // จะเรียงใหม่ก็ต่อเมื่อเปิดแท็บประวัติออเดอร์ หรือมีออเดอร์เข้า/ออก
+  const receiptIdsKey = receipts.map((receipt) => receipt.orderId).join("|");
+  const [sortedForKey, setSortedForKey] = useState<string | null>(null);
+  const [orderSequence, setOrderSequence] = useState<string[]>([]);
+  if (sortedForKey !== receiptIdsKey) {
+    setSortedForKey(receiptIdsKey);
+    setOrderSequence(sortReceiptIds(receipts));
+  }
+
+  function openOrdersTab() {
+    setOrderSequence(sortReceiptIds(receipts));
+    setTab("orders");
+  }
+
+  // กันดับเบิลคลิกปุ่มเดิม (จะสลับ 2 รอบจนเหมือนไม่ได้กด) — ออเดอร์อื่นกดต่อกันได้ทันที
+  function handleToggleCompleted(orderId: string, clickedAt: number) {
+    const last = lastToggleRef.current;
+    if (last.orderId === orderId && clickedAt - last.at < TOGGLE_COOLDOWN_MS) return;
+    lastToggleRef.current = { orderId, at: clickedAt };
+    toggleOrderCompleted(orderId);
+  }
 
   async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -198,13 +237,10 @@ export default function AdminPage() {
     return <AdminLogin />;
   }
 
-  // ออเดอร์ที่ยังไม่เสร็จอยู่บนสุด (ใหม่ก่อน), ออเดอร์ที่เสร็จแล้วเด้งไปอยู่ล่างสุด
-  const sortedReceipts = [...receipts].sort((a, b) => {
-    const aDone = !!a.completed;
-    const bDone = !!b.completed;
-    if (aDone !== bDone) return aDone ? 1 : -1;
-    return b.timestamp - a.timestamp;
-  });
+  const receiptById = new Map(receipts.map((receipt) => [receipt.orderId, receipt]));
+  const sortedReceipts = orderSequence
+    .map((orderId) => receiptById.get(orderId))
+    .filter((receipt): receipt is PaymentReceipt => receipt !== undefined);
 
   return (
     <div>
@@ -237,7 +273,7 @@ export default function AdminPage() {
         </button>
         <button
           className={`tab-btn ${tab === "orders" ? "active" : ""}`}
-          onClick={() => setTab("orders")}
+          onClick={openOrdersTab}
         >
           🧾 ประวัติออเดอร์ ({receipts.length})
         </button>
@@ -480,9 +516,16 @@ export default function AdminPage() {
                       <button
                         type="button"
                         className={isDone ? "btn btn-ghost btn-sm" : "btn btn-primary btn-sm"}
-                        onClick={() => toggleOrderCompleted(receipt.orderId)}
+                        onClick={(e) => handleToggleCompleted(receipt.orderId, e.timeStamp)}
+                        aria-pressed={isDone}
+                        title={
+                          isDone
+                            ? "กดเพื่อเปลี่ยนกลับเป็นยังไม่ได้ทำ"
+                            : "กดเพื่อเปลี่ยนเป็นเสร็จเรียบร้อยแล้ว"
+                        }
                       >
-                        {isDone ? "↩️ ยกเลิกเสร็จ" : "✅ เสร็จเรียบร้อยแล้ว"}
+                        {/* ข้อความบอก "สถานะปัจจุบัน" ไม่ใช่สิ่งที่จะเกิดเมื่อกด */}
+                        {isDone ? "✅ เสร็จเรียบร้อยแล้ว" : "ยังไม่ได้ทำ"}
                       </button>
                     </div>
                   </div>
