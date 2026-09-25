@@ -143,6 +143,7 @@ export default function AdminPage() {
     const item = menu.find((entry) => entry.getId() === id);
     if (!item) return;
     setFormError("");
+    setUploadError("");
     setEditingId(id);
     setDraft({
       name: item.getName(),
@@ -158,6 +159,7 @@ export default function AdminPage() {
     setEditingId(null);
     setDraft(EMPTY_DRAFT);
     setFormError("");
+    setUploadError("");
   }
 
   function handleDelete(id: string, name: string) {
